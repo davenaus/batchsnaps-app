@@ -11,6 +11,7 @@ import './SplashPage.css';
 import { saveAs } from 'file-saver';
 
 function EditorContainer() {
+  console.log('EditorContainer mounting');
   const [session, setSession] = useState(null);
   const [isPremium, setIsPremium] = useState(false);
   const [images, setImages] = useState([]);

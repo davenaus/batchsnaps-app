@@ -4,15 +4,34 @@ import { useEffect } from 'react';
 function AdWrapper({ children, isPremium }) {
   useEffect(() => {
     if (!isPremium) {
-      // Load Google Ads script
-      const script = document.createElement('script');
-      script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
-      script.async = true;
-      document.body.appendChild(script);
+      try {
+        // Load Google Ads script
+        const script = document.createElement('script');
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+        script.async = true;
+        script.onerror = (error) => {
+          console.log('Ad script failed to load:', error);
+          // Continue silently - don't let ad errors break the app
+        };
+        document.body.appendChild(script);
 
-      return () => {
-        document.body.removeChild(script);
-      };
+        // Initialize ads
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+        } catch (adsError) {
+          console.log('Ads initialization error:', adsError);
+        }
+
+        return () => {
+          // Clean up script only if it was successfully added
+          if (document.body.contains(script)) {
+            document.body.removeChild(script);
+          }
+        };
+      } catch (error) {
+        console.log('General ad setup error:', error);
+        // Continue silently
+      }
     }
   }, [isPremium]);
 
@@ -23,25 +42,33 @@ function AdWrapper({ children, isPremium }) {
   return (
     <div className="ad-wrapper">
       <div className="ad-left">
-        {/* Google Ad Component */}
-        <ins className="adsbygoogle"
-             style={{display: 'block'}}
-             data-ad-client="YOUR-AD-CLIENT-ID"
-             data-ad-slot="YOUR-AD-SLOT-ID"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        {!isPremium && (
+          <div style={{ minHeight: '600px', width: '160px' }}>
+            {/* Google Ad Component */}
+            <ins className="adsbygoogle"
+                style={{display: 'block'}}
+                data-ad-client="YOUR-AD-CLIENT-ID"
+                data-ad-slot="YOUR-AD-SLOT-ID"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+          </div>
+        )}
       </div>
       <div className="main-content">
         {children}
       </div>
       <div className="ad-right">
-        {/* Google Ad Component */}
-        <ins className="adsbygoogle"
-             style={{display: 'block'}}
-             data-ad-client="YOUR-AD-CLIENT-ID"
-             data-ad-slot="YOUR-AD-SLOT-ID"
-             data-ad-format="auto"
-             data-full-width-responsive="true"></ins>
+        {!isPremium && (
+          <div style={{ minHeight: '600px', width: '160px' }}>
+            {/* Google Ad Component */}
+            <ins className="adsbygoogle"
+                style={{display: 'block'}}
+                data-ad-client="YOUR-AD-CLIENT-ID"
+                data-ad-slot="YOUR-AD-SLOT-ID"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+          </div>
+        )}
       </div>
     </div>
   );
