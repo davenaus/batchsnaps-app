@@ -4,7 +4,6 @@ import { supabase } from '../supabaseClient';
 import ImagePreview from './ImagePreview';
 import Controls from './Controls';
 import ImageCarousel from './ImageCarousel';
-import AdWrapper from './AdWrapper';
 import JSZip from 'jszip';
 import './EditorContainer.css';
 import './SplashPage.css';
@@ -329,100 +328,177 @@ function EditorContainer() {
     saveAs(content, 'edited_screenshots.zip');
   }, [images]);
 
+
+  useEffect(() => {
+    if (!isPremium) {
+      try {
+        const script = document.createElement('script');
+        script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
+        script.async = true;
+        script.onerror = () => {
+          console.log('Ad script failed to load - continuing without ads');
+        };
+        document.body.appendChild(script);
+
+        // Initialize ads
+        try {
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({}); // Push twice for two ads
+        } catch (adsError) {
+          console.log('Ads initialization error:', adsError);
+        }
+
+        return () => {
+          if (document.body.contains(script)) {
+            document.body.removeChild(script);
+          }
+        };
+      } catch (error) {
+        console.log('Ad setup error:', error);
+      }
+    }
+  }, [isPremium]);
+
   return (
-    <AdWrapper isPremium={isPremium}>
-      <div className="editor-container">
-        <header className="editor-header">
-          <div className="editor-logo">BatchSnaps</div>
-          <div className="editor-settings" ref={settingsRef}>
-            <button
-              className="editor-settings-button"
-              onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
-            >
-              <i className='bx bx-cog'></i>
-            </button>
-            {showSettingsDropdown && (
-              <div className="editor-settings-dropdown">
-                {session ? (
-                  <>
-                    <span className="editor-settings-item user-name">Hi, {session.user.user_metadata.full_name}</span>
-                    {isPremium ? (
-                      <button className="editor-settings-item" onClick={handleManageBilling}>Manage Billing</button>
-                    ) : (
-                      <button className="editor-settings-item" onClick={handleUpgrade}>Upgrade</button>
-                    )}
-                    <button className="editor-sign-out-button" onClick={handleSignOut}>Sign Out</button>
-                  </>
-                ) : (
-                  <button className="editor-settings-item" onClick={handleSignIn}>Sign In</button>
-                )}
-              </div>
-            )}
-          </div>
-        </header>
-        <div className="editor-content">
-          {images.length === 0 ? (
-            <div className="editor-drop-area" onClick={triggerFileUpload}>
-              <i className='bx bx-upload'></i>
-              <p>Drop images here or click to upload</p>
+    <div className="editor-container">
+      <header className="editor-header">
+        <div className="editor-logo">BatchSnaps</div>
+        <div className="editor-settings" ref={settingsRef}>
+          <button
+            className="editor-settings-button"
+            onClick={() => setShowSettingsDropdown(!showSettingsDropdown)}
+          >
+            <i className='bx bx-cog'></i>
+          </button>
+          {showSettingsDropdown && (
+            <div className="editor-settings-dropdown">
+              {session ? (
+                <>
+                  <span className="editor-settings-item user-name">Hi, {session.user.user_metadata.full_name}</span>
+                  {isPremium ? (
+                    <button className="editor-settings-item" onClick={handleManageBilling}>Manage Billing</button>
+                  ) : (
+                    <button className="editor-settings-item" onClick={handleUpgrade}>Upgrade</button>
+                  )}
+                  <button className="editor-sign-out-button" onClick={handleSignOut}>Sign Out</button>
+                </>
+              ) : (
+                <button className="editor-settings-item" onClick={handleSignIn}>Sign In</button>
+              )}
             </div>
-          ) : (
-            <>
-              <div className="editor-main">
-                <div className="image-preview-container">
-                  <ImagePreview
-                    currentImage={images[currentImageIndex]}
-                    triggerFileUpload={triggerFileUpload}
-                    handleFiles={handleFiles}
-                    exportCanvasRef={exportCanvasRef}
-                    updateImageAttribute={updateImageAttribute}
-                  />
-                </div>
-                {images.length > 1 && (
-                  <ImageCarousel
-                    images={images}
-                    currentImageIndex={currentImageIndex}
-                    setCurrentImageIndex={setCurrentImageIndex}
-                  />
-                )}
-              </div>
-              <div className="editor-controls">
-                <Controls
-                  currentImage={images[currentImageIndex]}
-                  updateImageAttribute={updateImageAttribute}
-                  linkedDimensions={linkedDimensions}
-                  setLinkedDimensions={setLinkedDimensions}
-                  triggerFileUpload={triggerFileUpload}
-                  deleteImage={deleteImage}
-                  downloadImage={downloadImage}
-                  applyToAll={applyToAll}
-                  downloadAll={downloadAll}
-                  isMultipleImages={images.length > 1}
-                  isPremium={isPremium}
-                  session={session}
-                />
-              </div>
-            </>
           )}
         </div>
-        {showSignInPopup && (
-          <div className="editor-sign-in-popup">
-            <h2>Sign in to edit more than 3 photos</h2>
-            <p>You've reached the limit for guest users. Sign in to edit up to 5 photos!</p>
-            <button className="editor-popup-button" onClick={() => { handleSignIn(); setShowSignInPopup(false); }}>Sign In</button>
-            <button className="editor-close-button" onClick={() => setShowSignInPopup(false)}>Close</button>
+      </header>
+
+      {/* Left Ad */}
+      {!isPremium && (
+        <div style={{
+          position: 'fixed',
+          left: '0',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '160px',
+          height: '600px',
+          zIndex: 999
+        }}>
+          <ins className="adsbygoogle"
+            style={{
+              display: 'block',
+              width: '160px',
+              height: '600px'
+            }}
+            data-ad-client="YOUR-AD-CLIENT-ID"
+            data-ad-slot="YOUR-AD-SLOT-ID"
+            data-ad-format="vertical" />
+        </div>
+      )}
+
+      {/* Right Ad */}
+      {!isPremium && (
+        <div style={{
+          position: 'fixed',
+          right: '0',
+          top: '50%',
+          transform: 'translateY(-50%)',
+          width: '160px',
+          height: '600px',
+          zIndex: 999
+        }}>
+          <ins className="adsbygoogle"
+            style={{
+              display: 'block',
+              width: '160px',
+              height: '600px'
+            }}
+            data-ad-client="YOUR-AD-CLIENT-ID"
+            data-ad-slot="YOUR-AD-SLOT-ID"
+            data-ad-format="vertical" />
+        </div>
+      )}
+
+      <div className="editor-content" style={{ margin: !isPremium ? '0 160px' : '0' }}>
+        {images.length === 0 ? (
+          <div className="editor-drop-area" onClick={triggerFileUpload}>
+            <i className='bx bx-upload'></i>
+            <p>Drop images here or click to upload</p>
           </div>
-        )}
-        {showUpgradePopup && (
-          <div className="editor-upgrade-popup">
-            <h2>Upgrade to Premium</h2>
-            <p>You've reached the limit of 5 photos for free users. Upgrade to edit unlimited photos!</p>
-            <button className="editor-popup-button" onClick={() => { handleUpgrade(); setShowUpgradePopup(false); }}>Upgrade</button>
-            <button className="editor-close-button" onClick={() => setShowUpgradePopup(false)}>Close</button>
-          </div>
+        ) : (
+          <>
+            <div className="editor-main">
+              <div className="image-preview-container">
+                <ImagePreview
+                  currentImage={images[currentImageIndex]}
+                  triggerFileUpload={triggerFileUpload}
+                  handleFiles={handleFiles}
+                  exportCanvasRef={exportCanvasRef}
+                  updateImageAttribute={updateImageAttribute}
+                />
+              </div>
+              {images.length > 1 && (
+                <ImageCarousel
+                  images={images}
+                  currentImageIndex={currentImageIndex}
+                  setCurrentImageIndex={setCurrentImageIndex}
+                />
+              )}
+            </div>
+            <div className="editor-controls">
+              <Controls
+                currentImage={images[currentImageIndex]}
+                updateImageAttribute={updateImageAttribute}
+                linkedDimensions={linkedDimensions}
+                setLinkedDimensions={setLinkedDimensions}
+                triggerFileUpload={triggerFileUpload}
+                deleteImage={deleteImage}
+                downloadImage={downloadImage}
+                applyToAll={applyToAll}
+                downloadAll={downloadAll}
+                isMultipleImages={images.length > 1}
+                isPremium={isPremium}
+                session={session}
+              />
+            </div>
+          </>
         )}
       </div>
-    </AdWrapper>
+
+      {showSignInPopup && (
+        <div className="editor-sign-in-popup">
+          <h2>Sign in to edit more than 3 photos</h2>
+          <p>You've reached the limit for guest users. Sign in to edit up to 5 photos!</p>
+          <button className="editor-popup-button" onClick={() => { handleSignIn(); setShowSignInPopup(false); }}>Sign In</button>
+          <button className="editor-close-button" onClick={() => setShowSignInPopup(false)}>Close</button>
+        </div>
+      )}
+      {showUpgradePopup && (
+        <div className="editor-upgrade-popup">
+          <h2>Upgrade to Premium</h2>
+          <p>You've reached the limit of 5 photos for free users. Upgrade to edit unlimited photos!</p>
+          <button className="editor-popup-button" onClick={() => { handleUpgrade(); setShowUpgradePopup(false); }}>Upgrade</button>
+          <button className="editor-close-button" onClick={() => setShowUpgradePopup(false)}>Close</button>
+        </div>
+      )}
+    </div>
   );
 }
 
