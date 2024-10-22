@@ -4,7 +4,7 @@ import { supabase } from './supabaseClient';
 import SplashPage from './components/SplashPage';
 import EditorContainer from './components/EditorContainer';
 import PricingPage from './components/PricingPage';
-import SignIn from './components/SignIn'; // Add this import
+import SignIn from './components/SignIn';
 
 function App() {
   const [session, setSession] = useState(null);
@@ -94,22 +94,18 @@ function App() {
           session ? <Navigate to="/editor" /> : <SplashPage onSignIn={handleSignIn} />
         } />
         <Route path="/editor" element={
-          session ? (
-            <EditorContainer 
-              session={session}
-              images={images}
-              setImages={setImages}
-              currentImageIndex={currentImageIndex}
-              setCurrentImageIndex={setCurrentImageIndex}
-              onSignIn={handleSignIn}
-              onSignOut={handleSignOut}
-            />
-          ) : (
-            <Navigate to="/signin?returnUrl=/editor" />
-          )
+          <EditorContainer 
+            session={session}
+            images={images}
+            setImages={setImages}
+            currentImageIndex={currentImageIndex}
+            setCurrentImageIndex={setCurrentImageIndex}
+            onSignIn={handleSignIn}
+            onSignOut={handleSignOut}
+          />
         } />
         <Route path="/pricing" element={<PricingPage />} />
-        <Route path="/signin" element={<SignIn />} /> {/* Add this new route */}
+        <Route path="/signin" element={<SignIn />} />
       </Routes>
     </Router>
   );
