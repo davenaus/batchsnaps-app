@@ -330,7 +330,7 @@ function EditorContainer() {
   }, [images]);
 
   return (
-
+    <AdWrapper isPremium={isPremium}>
       <div className="editor-container">
         <header className="editor-header">
           <div className="editor-logo">BatchSnaps</div>
@@ -422,7 +422,7 @@ function EditorContainer() {
           </div>
         )}
       </div>
-
+    </AdWrapper>
   );
 }
 
