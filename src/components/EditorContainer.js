@@ -155,7 +155,7 @@ function EditorContainer() {
 
   const downloadImage = () => {
     if (currentImageIndex === -1 || !exportCanvasRef.current) return;
-    const canvas = exportCanvasRef.current;
+    let canvas = exportCanvasRef.current;
     let maxResolution = isPremium ? Math.max(canvas.width, canvas.height) : 1080;
     
     if (!isPremium && Math.max(canvas.width, canvas.height) > maxResolution) {
