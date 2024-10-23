@@ -15,28 +15,49 @@ const PricingSection = () => {
   const navigate = useNavigate();
 
   const handlePurchase = async (priceId) => {
-    const session = await supabase.auth.getSession();
-    if (!session.data.session) {
-      navigate(`/signin?returnUrl=${encodeURIComponent(`/pricing?priceId=${priceId}`)}`);
-      return;
-    }
-  
     try {
+      console.log('Starting purchase process for:', priceId);
+      
+      const session = await supabase.auth.getSession();
+      if (!session.data.session) {
+        console.log('No session found, redirecting to signin');
+        navigate(`/signin?returnUrl=${encodeURIComponent(`/pricing?priceId=${priceId}`)}`);
+        return;
+      }
+  
+      const userId = session.data.session.user.id;
+      console.log('User ID:', userId);
+  
+      console.log('Invoking checkout function with:', { priceId, userId });
       const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-        body: JSON.stringify({ priceId, userId: session.data.session.user.id }),
+        body: JSON.stringify({ priceId, userId }),
       });
-    
-      if (error) throw error;
-    
+  
+      if (error) {
+        console.error('Supabase function error:', error);
+        throw error;
+      }
+  
+      if (!data?.sessionId) {
+        console.error('No session ID returned:', data);
+        throw new Error('Invalid response from server');
+      }
+  
+      console.log('Got session ID:', data.sessionId);
       const stripe = await stripePromise;
+      
+      console.log('Redirecting to checkout...');
       const { error: stripeError } = await stripe.redirectToCheckout({
         sessionId: data.sessionId,
       });
-    
-      if (stripeError) throw stripeError;
+  
+      if (stripeError) {
+        console.error('Stripe redirect error:', stripeError);
+        throw stripeError;
+      }
     } catch (error) {
-      console.error('Error:', error);
-      alert('An error occurred. Please try again.');
+      console.error('Full error details:', error);
+      alert(`Error: ${error.message}. Please try again or contact support.`);
     }
   };
 
