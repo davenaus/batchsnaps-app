@@ -9,8 +9,8 @@ const corsHeaders = {
 };
 
 const PRICE_IDS = {
-  PREMIUM: 'price_1QCZGfDRxLtEGzRIi8jMrkVe', // Replace with your Premium price ID
-  LIFETIME: 'price_1QCZI5DRxLtEGzRIflAay27v'  // Replace with your Lifetime price ID
+  PREMIUM: 'price_1QCZGfDRxLtEGzRIi8jMrkVe',
+  LIFETIME: 'price_1QCZI5DRxLtEGzRIflAay27v'
 };
 
 const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
@@ -45,6 +45,8 @@ serve(async (req) => {
       Deno.env.get('STRIPE_WEBHOOK_SECRET') as string
     );
 
+    console.log('Processing webhook event:', event.type);
+
     switch (event.type) {
       case 'checkout.session.completed':
         const session = event.data.object;
@@ -63,6 +65,8 @@ serve(async (req) => {
           });
         }
 
+        console.log('Updating profile for user:', userId, 'to plan:', planType);
+
         const { error } = await supabase
           .from('profiles')
           .update({ plan_type: planType })
@@ -77,6 +81,33 @@ serve(async (req) => {
         }
         break;
 
+      case 'customer.subscription.deleted':
+        const subscription = event.data.object;
+        const deletedCustomer = await stripe.customers.retrieve(subscription.customer as string);
+        const deletedUserId = deletedCustomer.metadata.supabase_user_id;
+
+        console.log('Subscription cancelled for user:', deletedUserId);
+
+        const { error: deleteError } = await supabase
+          .from('profiles')
+          .update({ plan_type: 'free' })
+          .eq('id', deletedUserId);
+
+        if (deleteError) {
+          console.error('Error updating user profile after cancellation:', deleteError);
+          return new Response('Error updating user profile', { 
+            status: 500,
+            headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+          });
+        }
+        break;
+
+      case 'invoice.payment_failed':
+        const failedInvoice = event.data.object;
+        console.log('Payment failed for invoice:', failedInvoice.id);
+        // You might want to notify the user or take other actions
+        break;
+
       default:
         console.log(`Unhandled event type ${event.type}`);
     }
@@ -85,6 +116,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (err) {
+    console.error('Webhook error:', err);
     return new Response(`Webhook Error: ${err.message}`, { 
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' }

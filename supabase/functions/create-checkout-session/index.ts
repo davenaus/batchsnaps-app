@@ -8,7 +8,6 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// Verify all required environment variables
 const requiredEnvVars = {
   STRIPE_SECRET_KEY: Deno.env.get('STRIPE_SECRET_KEY'),
   FRONTEND_URL: Deno.env.get('FRONTEND_URL'),
@@ -16,7 +15,6 @@ const requiredEnvVars = {
   SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
 };
 
-// Check for missing environment variables
 const missingVars = Object.entries(requiredEnvVars)
   .filter(([_, value]) => !value)
   .map(([key]) => key);
@@ -50,13 +48,21 @@ serve(async (req) => {
 
     const { data: profile, error } = await supabase
       .from('profiles')
-      .select('stripe_customer_id')
+      .select('stripe_customer_id, plan_type')
       .eq('id', userId)
       .single();
 
     if (error) {
       console.error('Profile fetch error:', error);
       return new Response(JSON.stringify({ error: 'User not found' }), { 
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    // Check if user already has lifetime access
+    if (profile.plan_type === 'lifetime') {
+      return new Response(JSON.stringify({ error: 'You already have lifetime access' }), {
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
@@ -82,9 +88,6 @@ serve(async (req) => {
         .eq('id', userId);
     }
 
-    const successUrl = `${requiredEnvVars.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
-    const cancelUrl = `${requiredEnvVars.FRONTEND_URL}/pricing`;
-
     // Check if it's a lifetime purchase based on the price ID
     const isLifetime = priceId === 'price_1QCZI5DRxLtEGzRIflAay27v';
     
@@ -92,20 +95,17 @@ serve(async (req) => {
       customer,
       priceId,
       mode: isLifetime ? 'payment' : 'subscription',
-      successUrl,
-      cancelUrl
     });
 
     const session = await stripe.checkout.sessions.create({
       customer,
       payment_method_types: ['card'],
-      line_items: [{ 
-        price: priceId,
-        quantity: 1 
-      }],
+      line_items: [{ price: priceId, quantity: 1 }],
       mode: isLifetime ? 'payment' : 'subscription',
-      success_url: successUrl,
-      cancel_url: cancelUrl,
+      success_url: `${requiredEnvVars.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${requiredEnvVars.FRONTEND_URL}/payment-canceled`,
+      allow_promotion_codes: true,
+      billing_address_collection: 'auto',
     });
 
     console.log('Created session:', session.id);

@@ -86,9 +86,19 @@ function EditorContainer() {
   };
 
 
-  const handleManageBilling = () => {
-    // Implement billing management logic here
-    console.log('Manage billing clicked');
+  const handleManageBilling = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('create-portal-session', {
+        body: JSON.stringify({ returnUrl: window.location.origin + '/editor' })
+      });
+  
+      if (error) throw error;
+  
+      window.location.href = data.url;
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Error accessing billing portal. Please try again.');
+    }
   };
 
   const createImageObject = (img) => ({
