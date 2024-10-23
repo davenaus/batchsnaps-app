@@ -7,8 +7,8 @@ const stripePromise = loadStripe(process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY);
 
 // Add your Stripe Price IDs here
 const PRICE_IDS = {
-  PREMIUM: 'prod_R4ii70QuQUjuaY', // Replace with your Premium price ID
-  LIFETIME: 'prod_R4ij23jzPsQr1W'  // Replace with your Lifetime price ID
+  PREMIUM: 'price_1QCZGfDRxLtEGzRIi8jMrkVe', // Replace with your Premium price ID
+  LIFETIME: 'price_1QCZI5DRxLtEGzRIflAay27v'  // Replace with your Lifetime price ID
 };
 
 const PricingSection = () => {
