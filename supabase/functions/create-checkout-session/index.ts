@@ -65,13 +65,16 @@ serve(async (req) => {
     let customer;
     if (profile.stripe_customer_id) {
       customer = profile.stripe_customer_id;
+      console.log('Using existing customer:', customer);
     } else {
+      console.log('Creating new Stripe customer');
       const newCustomer = await stripe.customers.create({
         metadata: {
           supabase_user_id: userId,
         },
       });
       customer = newCustomer.id;
+      console.log('Created new customer:', customer);
 
       await supabase
         .from('profiles')
@@ -82,17 +85,30 @@ serve(async (req) => {
     const successUrl = `${requiredEnvVars.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${requiredEnvVars.FRONTEND_URL}/pricing`;
 
-    // Determine if this is a lifetime or subscription purchase
-    const isLifetime = priceId === PRICE_IDS.LIFETIME;
+    // Check if it's a lifetime purchase based on the price ID
+    const isLifetime = priceId === 'price_1QCZI5DRxLtEGzRIflAay27v';
     
+    console.log('Creating checkout session with:', {
+      customer,
+      priceId,
+      mode: isLifetime ? 'payment' : 'subscription',
+      successUrl,
+      cancelUrl
+    });
+
     const session = await stripe.checkout.sessions.create({
       customer,
       payment_method_types: ['card'],
-      line_items: [{ price: priceId, quantity: 1 }],
+      line_items: [{ 
+        price: priceId,
+        quantity: 1 
+      }],
       mode: isLifetime ? 'payment' : 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,
     });
+
+    console.log('Created session:', session.id);
 
     return new Response(JSON.stringify({ sessionId: session.id }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
