@@ -103,7 +103,6 @@ const PricingSection = () => {
             <li><i className='bx bx-check mr-2'></i>All Premium features</li>
             <li><i className='bx bx-check mr-2'></i>One-time payment</li>
             <li><i className='bx bx-check mr-2'></i>Lifetime updates</li>
-            <li><i className='bx bx-check mr-2'></i>Exclusive features</li>
           </ul>
           <button 
             className="splashpage-plan-cta" 

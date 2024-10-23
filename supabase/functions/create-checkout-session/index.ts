@@ -82,13 +82,14 @@ serve(async (req) => {
     const successUrl = `${requiredEnvVars.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
     const cancelUrl = `${requiredEnvVars.FRONTEND_URL}/pricing`;
 
-    console.log('Creating session with URLs:', { successUrl, cancelUrl });
-
+    // Determine if this is a lifetime or subscription purchase
+    const isLifetime = priceId === PRICE_IDS.LIFETIME;
+    
     const session = await stripe.checkout.sessions.create({
       customer,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      mode: priceId.includes('lifetime') ? 'payment' : 'subscription',
+      mode: isLifetime ? 'payment' : 'subscription',
       success_url: successUrl,
       cancel_url: cancelUrl,
     });
