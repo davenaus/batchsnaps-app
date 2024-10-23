@@ -8,7 +8,24 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') as string, {
+// Verify all required environment variables
+const requiredEnvVars = {
+  STRIPE_SECRET_KEY: Deno.env.get('STRIPE_SECRET_KEY'),
+  FRONTEND_URL: Deno.env.get('FRONTEND_URL'),
+  SUPABASE_URL: Deno.env.get('SUPABASE_URL'),
+  SUPABASE_SERVICE_ROLE_KEY: Deno.env.get('SUPABASE_SERVICE_ROLE_KEY'),
+};
+
+// Check for missing environment variables
+const missingVars = Object.entries(requiredEnvVars)
+  .filter(([_, value]) => !value)
+  .map(([key]) => key);
+
+if (missingVars.length > 0) {
+  console.error('Missing environment variables:', missingVars);
+}
+
+const stripe = new Stripe(requiredEnvVars.STRIPE_SECRET_KEY as string, {
   apiVersion: '2022-11-15',
   httpClient: Stripe.createFetchHttpClient(),
 });
@@ -19,87 +36,62 @@ serve(async (req) => {
   }
 
   try {
-    // Log incoming request
-    console.log('Incoming request body:', await req.clone().text());
-    
-    const { priceId, userId } = await req.json();
-    console.log('Parsed request data:', { priceId, userId });
-
-    // Verify environment variables
-    const supabaseUrl = Deno.env.get('SUPABASE_URL');
-    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
-    
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase configuration');
+    if (missingVars.length > 0) {
+      throw new Error(`Missing required environment variables: ${missingVars.join(', ')}`);
     }
 
-    const supabase = createClient(supabaseUrl, supabaseKey);
+    const { priceId, userId } = await req.json();
+    console.log('Request data:', { priceId, userId });
 
-    // Get user profile
-    console.log('Fetching user profile for:', userId);
-    const { data: profile, error: profileError } = await supabase
+    const supabase = createClient(
+      requiredEnvVars.SUPABASE_URL as string,
+      requiredEnvVars.SUPABASE_SERVICE_ROLE_KEY as string
+    );
+
+    const { data: profile, error } = await supabase
       .from('profiles')
       .select('stripe_customer_id')
       .eq('id', userId)
       .single();
 
-    if (profileError) {
-      console.error('Profile fetch error:', profileError);
-      return new Response(JSON.stringify({ 
-        error: 'User not found',
-        details: profileError 
-      }), { 
+    if (error) {
+      console.error('Profile fetch error:', error);
+      return new Response(JSON.stringify({ error: 'User not found' }), { 
         status: 400,
         headers: { ...corsHeaders, 'Content-Type': 'application/json' }
       });
     }
 
-    console.log('Found profile:', profile);
-
     let customer;
     if (profile.stripe_customer_id) {
       customer = profile.stripe_customer_id;
-      console.log('Using existing customer:', customer);
     } else {
-      console.log('Creating new Stripe customer');
       const newCustomer = await stripe.customers.create({
         metadata: {
           supabase_user_id: userId,
         },
       });
       customer = newCustomer.id;
-      console.log('Created new customer:', customer);
 
-      const updateResult = await supabase
+      await supabase
         .from('profiles')
         .update({ stripe_customer_id: customer })
         .eq('id', userId);
-      
-      console.log('Profile update result:', updateResult);
     }
 
-    // Determine checkout mode based on price ID
-    const mode = priceId.includes('lifetime') ? 'payment' : 'subscription';
-    console.log('Checkout mode:', mode);
+    const successUrl = `${requiredEnvVars.FRONTEND_URL}/payment-success?session_id={CHECKOUT_SESSION_ID}`;
+    const cancelUrl = `${requiredEnvVars.FRONTEND_URL}/pricing`;
 
-    console.log('Creating checkout session with:', {
-      customer,
-      priceId,
-      mode,
-      successUrl: `${Deno.env.get('FRONTEND_URL')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancelUrl: `${Deno.env.get('FRONTEND_URL')}/pricing`
-    });
+    console.log('Creating session with URLs:', { successUrl, cancelUrl });
 
     const session = await stripe.checkout.sessions.create({
       customer,
       payment_method_types: ['card'],
       line_items: [{ price: priceId, quantity: 1 }],
-      mode,
-      success_url: `${Deno.env.get('FRONTEND_URL')}/payment-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${Deno.env.get('FRONTEND_URL')}/pricing`,
+      mode: priceId.includes('lifetime') ? 'payment' : 'subscription',
+      success_url: successUrl,
+      cancel_url: cancelUrl,
     });
-
-    console.log('Created session:', session.id);
 
     return new Response(JSON.stringify({ sessionId: session.id }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -108,8 +100,7 @@ serve(async (req) => {
     console.error('Full error:', error);
     return new Response(JSON.stringify({ 
       error: error.message,
-      stack: error.stack,
-      details: error 
+      details: error
     }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
