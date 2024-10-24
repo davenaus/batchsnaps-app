@@ -271,6 +271,273 @@
 }
 
 
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+
+.splashpage {
+    font-family: 'Poppins', sans-serif;
+    background-color: #1a1a1a;
+    color: #ffffff;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+
+.splashpage-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem;
+}
+
+.splashpage-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 0.5rem;
+}
+
+.splashpage-logo {
+    font-size: 1.75rem;
+    font-weight: bold;
+    color: #ffffff;
+}
+
+.splashpage-sign-in-button {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1.25rem;
+    background-color: rgba(58, 58, 58, 0.5);
+    color: #ffffff;
+    border: none;
+    width: auto;
+    border-radius: 9999px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    white-space: nowrap;
+}
+
+.splashpage-sign-in-button i {
+    margin-right: 0.5rem;
+}
+
+.splashpage-hero-section {
+    text-align: center;
+    margin-bottom: 3rem;
+    padding: 0 1rem;
+}
+
+.splashpage-title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: bold;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.splashpage-subtitle {
+    font-size: clamp(1rem, 3vw, 1.5rem);
+    margin-bottom: 2rem;
+    color: #d4d4d4;
+    line-height: 1.4;
+}
+
+.splashpage-cta-button {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.75rem 2rem;
+    background-color: rgba(58, 58, 58, 0.5);
+    color: #ffffff;
+    border: none;
+    border-radius: 9999px;
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    font-weight: bold;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+}
+
+.splashpage-hero-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.5rem;
+    margin-top: 2rem;
+}
+
+.splashpage-section-title {
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    font-weight: bold;
+    text-align: center;
+    margin: 2rem 0;
+}
+
+.splashpage-feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 4rem;
+    padding: 0 1rem;
+}
+
+.splashpage-feature-card {
+    background-color: rgba(42, 42, 42, 0.5);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.splashpage-feature-icon {
+    font-size: 2.5rem;
+    color: #d5d5d5;
+    margin-bottom: 0.75rem;
+}
+
+.splashpage-feature-title {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.splashpage-pricing-grid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2rem;
+    padding: 1rem;
+}
+
+.splashpage-pricing-card {
+    background-color: rgba(42, 42, 42, 0.5);
+    padding: 1.5rem;
+    border-radius: 1rem;
+    text-align: center;
+    width: 100%;
+    max-width: 350px;
+    backdrop-filter: blur(10px);
+}
+
+.splashpage-plan-price {
+    font-size: clamp(1.5rem, 3vw, 2rem);
+}
+
+.splashpage-footer {
+    margin-top: 3rem;
+    padding: 2rem 1rem;
+    text-align: center;
+    background-color: rgba(42, 42, 42, 0.5);
+    backdrop-filter: blur(10px);
+}
+
+.splashpage-footer-grid {
+    display: grid;
+    gap: 1.5rem;
+    justify-items: center;
+}
+
+/* Media Queries */
+@media (min-width: 768px) {
+    .splashpage-container {
+        padding: 2rem;
+    }
+
+    .splashpage-pricing-grid {
+        flex-direction: row;
+        justify-content: center;
+        padding: 2rem;
+    }
+
+    .splashpage-pricing-card.highlighted {
+        transform: scale(1.05);
+    }
+
+    .splashpage-footer-grid {
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    }
+}
+
+@media (max-width: 767px) {
+    .splashpage-header {
+        justify-content: center;
+        text-align: center;
+    }
+
+    .splashpage-sign-in-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .splashpage-cta-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .splashpage-pricing-card {
+        margin: 0 auto;
+    }
+
+    .splashpage-pricing-card.highlighted {
+        transform: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .splashpage-feature-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .splashpage-plan-features {
+        padding: 0 0.5rem;
+    }
+
+    .splashpage-title {
+        font-size: 2rem;
+    }
+
+    .splashpage-subtitle {
+        font-size: 1rem;
+    }
+}
+
+/* Animation delay utilities */
+.delay-100 {
+    animation-delay: 100ms;
+}
+
+.delay-200 {
+    animation-delay: 200ms;
+}
+
+.delay-300 {
+    animation-delay: 300ms;
+}
+
+/* Maintain existing animations */
+.splashpage-fade-in-up {
+    animation: splashpageFadeInUp 1s ease-out forwards;
+}
+
+@keyframes splashpageFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+    .splashpage-fade-in-up {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+}
+
+
 .privacy-content,
 .terms-content {
   max-width: 800px;

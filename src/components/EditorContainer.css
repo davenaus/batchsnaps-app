@@ -1,10 +1,10 @@
 .editor-container {
-    min-height: 100vh;
+    /* min-height: 100vh; */
     display: flex;
     flex-direction: column;
     background-color: var(--background);
     color: var(--foreground);
-    margin-top: 80px;
+     margin-top: 65px; 
   }
   
   .editor-header {
@@ -515,3 +515,251 @@
   .button-group {
     margin-bottom: 1rem;
   }
+
+
+  /* Base mobile styles - Add these to your EditorContainer.css */
+@media screen and (max-width: 768px) {
+  .editor-container {
+    margin-top: 60px; /* Reduced top margin for mobile */
+  }
+
+  .editor-header {
+    padding: 0.5rem 1rem;
+    height: 60px;
+  }
+
+  .editor-logo {
+    font-size: 1.2rem;
+  }
+
+  .editor-content {
+    flex-direction: column;
+    padding: 0.5rem;
+    margin-top: 0;
+    height: auto;
+    overflow: visible;
+  }
+
+  .editor-main {
+    margin-right: 0;
+    margin-bottom: 1rem;
+    overflow: visible;
+  }
+
+  .image-preview-container {
+    width: 100%;
+    height: auto;
+    max-height: 50vh;
+  }
+
+  .image-preview {
+    height: auto;
+    min-height: 200px;
+    max-height: 50vh;
+  }
+
+  #image-preview {
+    height: auto;
+    max-height: 10vh;
+    min-height: 350px;
+    min-width: -webkit-fill-available;
+  }
+
+
+  .editor-controls {
+    max-height: none;
+    overflow: visible;
+    padding-bottom: 60px;
+    align-self: center;
+  }
+
+  .editor-drop-area {
+    width: 100%;
+    height: 300px;
+    padding: 2rem;
+  }
+
+  .editor-drop-area i {
+    font-size: 2rem;
+  }
+
+  .editor-drop-area p {
+    font-size: 1rem;
+  }
+
+  /* Settings dropdown adjustments */
+  .editor-settings-dropdown {
+    right: 1rem;
+    width: calc(100vw - 2rem);
+    max-width: 300px;
+  }
+
+  /* Popup adjustments */
+  .editor-sign-in-popup,
+  .editor-upgrade-popup {
+    width: 90%;
+    max-width: 350px;
+    padding: 1.5rem;
+  }
+
+  /* Carousel adjustments */
+  #image-carousel {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+    padding: 0.5rem 0;
+  }
+
+  #image-carousel::-webkit-scrollbar {
+    display: none; /* Chrome, Safari and Opera */
+  }
+
+  .navigation-buttons-container {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  #root {
+    align-self: center;
+  }
+
+  .navigation-button {
+    width: calc(50% - 0.5rem);
+    height: 36px;
+    padding: 0.5rem;
+    font-size: 0.9rem;
+  }
+
+  /* Controls adjustments */
+  .control-group {
+    padding: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .control-item {
+    margin-bottom: 0.75rem;
+  }
+
+  /* Ad placements for mobile */
+  .editor-content {
+    margin: 0 !important; /* Override inline styles */
+  }
+
+  /* Move ads to top and bottom for mobile */
+  [class*="adsbygoogle"] {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    height: 100px !important;
+    max-height: 100px !important;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Smaller phones */
+@media screen and (max-width: 480px) {
+  .editor-header {
+    padding: 0.5rem;
+  }
+
+  .editor-logo {
+    font-size: 1rem;
+  }
+
+  .editor-settings-button {
+    font-size: 1.2rem;
+  }
+
+  .editor-drop-area {
+    height: 250px;
+  }
+
+  .navigation-button {
+    width: 100%;
+    margin: 0.25rem 0;
+  }
+
+  /* Adjust popup sizes */
+  .editor-sign-in-popup,
+  .editor-upgrade-popup {
+    width: 95%;
+    padding: 1rem;
+  }
+
+  .editor-popup-button,
+  .editor-close-button {
+    width: 100%;
+    margin: 0.5rem 0;
+  }
+}
+
+/* Handle landscape mode */
+@media screen and (max-height: 480px) and (orientation: landscape) {
+  .editor-content {
+    flex-direction: row;
+  }
+
+  .editor-main {
+    width: 60%;
+    margin-right: 1rem;
+  }
+
+  .editor-controls {
+    width: 40%;
+  }
+
+  .image-preview-container {
+    max-height: 70vh;
+  }
+
+  /* Adjust popup positioning */
+  .editor-sign-in-popup,
+  .editor-upgrade-popup {
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+/* Tablet adjustments */
+@media screen and (min-width: 769px) and (max-width: 1024px) {
+  .editor-content {
+    flex-direction: column;
+  }
+
+  .editor-main {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .editor-controls {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* Adjust ad placements for tablets */
+  [class*="adsbygoogle"] {
+    position: relative !important;
+    width: 728px !important;
+    height: 90px !important;
+    margin: 1rem auto;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+  }
+}
+
+/* Fix for iOS Safari bottom bar */
+@supports (-webkit-touch-callout: none) {
+  .editor-content {
+    padding-bottom: env(safe-area-inset-bottom, 20px);
+  }
+
+  .editor-controls {
+    padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 60px);
+  }
+}
+
+
+
