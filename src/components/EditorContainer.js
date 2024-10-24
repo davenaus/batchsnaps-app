@@ -88,16 +88,31 @@ function EditorContainer() {
 
   const handleManageBilling = async () => {
     try {
+      // Get the current session
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      
+      if (!currentSession) {
+        throw new Error('No active session');
+      }
+  
       const { data, error } = await supabase.functions.invoke('create-portal-session', {
-        body: JSON.stringify({ returnUrl: window.location.origin + '/editor' })
+        body: JSON.stringify({ 
+          returnUrl: window.location.origin + '/editor' 
+        }),
+        headers: {
+          Authorization: `Bearer ${currentSession.access_token}`
+        }
       });
   
       if (error) throw error;
+      if (!data?.url) throw new Error('No portal URL returned');
   
+      // Redirect to the Stripe portal
       window.location.href = data.url;
     } catch (error) {
-      console.error('Error:', error);
-      alert('Error accessing billing portal. Please try again.');
+      console.error('Billing portal error:', error);
+      // Provide a more user-friendly error message
+      alert('Unable to access billing portal at this time. Please try again later or contact support.');
     }
   };
 
