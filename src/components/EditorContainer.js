@@ -377,7 +377,7 @@ function EditorContainer() {
 
 
   useEffect(() => {
-    if (!isPremium && !isMobile) {
+    if (!isPremium) {
       try {
         const script = document.createElement('script');
         script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
@@ -386,15 +386,15 @@ function EditorContainer() {
           console.log('Ad script failed to load - continuing without ads');
         };
         document.body.appendChild(script);
-  
+
         // Initialize ads
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
-          (window.adsbygoogle = window.adsbygoogle || []).push({});
+          (window.adsbygoogle = window.adsbygoogle || []).push({}); // Push twice for two ads
         } catch (adsError) {
           console.log('Ads initialization error:', adsError);
         }
-  
+
         return () => {
           if (document.body.contains(script)) {
             document.body.removeChild(script);
@@ -404,7 +404,7 @@ function EditorContainer() {
         console.log('Ad setup error:', error);
       }
     }
-  }, [isPremium, isMobile]);
+  }, [isPremium]);
 
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
 
