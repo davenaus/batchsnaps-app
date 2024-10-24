@@ -269,3 +269,66 @@
     transform: translateY(20px);
     animation: splashpageFadeInUp 1s ease-out forwards 0.5s;
 }
+
+
+.privacy-content,
+.terms-content {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: var(--card);
+  border-radius: var(--radius);
+}
+
+.privacy-content h1,
+.terms-content h1 {
+  color: var(--primary);
+  margin-bottom: 1rem;
+  font-size: 2.5rem;
+}
+
+.privacy-content .intro,
+.terms-content .intro {
+  color: var(--muted-foreground);
+  margin-bottom: 2rem;
+  font-size: 1.1rem;
+  line-height: 1.6;
+}
+
+.privacy-content h2,
+.terms-content h2 {
+  color: var(--primary);
+  margin: 2rem 0 1rem 0;
+  font-size: 1.8rem;
+}
+
+.privacy-content section,
+.terms-content section {
+  margin-bottom: 2rem;
+}
+
+.privacy-content p,
+.terms-content p {
+  margin-bottom: 1rem;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+.privacy-content ul,
+.terms-content ul {
+  list-style: disc;
+  margin: 1rem 0 1rem 2rem;
+}
+
+.privacy-content li,
+.terms-content li {
+  margin-bottom: 0.8rem;
+  line-height: 1.6;
+  color: var(--foreground);
+}
+
+.privacy-content strong,
+.terms-content strong {
+  color: var(--primary);
+  font-weight: 600;
+}

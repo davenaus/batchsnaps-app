@@ -7,6 +7,8 @@ import PricingPage from './components/PricingPage';
 import SignIn from './components/SignIn';
 import PaymentSuccess from './components/PaymentSuccess';   
 import PaymentCanceled from './components/PaymentCanceled';
+import PrivacyPolicy from './components/PrivacyPolicy';
+import TermsConditions from './components/TermsConditions';
 
 // Error Boundary Component
 class ErrorBoundary extends React.Component {
@@ -161,6 +163,8 @@ function App() {
           <Route path="/signin" element={<SignIn />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
+          <Route path="/privacy" element={<PrivacyPolicy />} />
+          <Route path="/terms" element={<TermsConditions />} />
         </Routes>
       </Router>
     </ErrorBoundary>

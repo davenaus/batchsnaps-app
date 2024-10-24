@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { supabase } from '../supabaseClient';
 import './SplashPage.css';
 import 'boxicons/css/boxicons.min.css';
 import PricingSection from './PricingSection';
+
 
 const SplashPage = () => {
   const navigate = useNavigate();
@@ -62,29 +63,10 @@ const SplashPage = () => {
           <div className="splashpage-container">
             <div className="splashpage-footer-grid">
               <div>
-                <h3>Company</h3>
                 <ul>
-                  <li><a href="#">About Us</a></li>
-                  <li><a href="#">Careers</a></li>
-                  <li><a href="#">Press</a></li>
+                <li><Link to="/terms">Terms of Service</Link></li>
+                <li><Link to="/privacy">Privacy Policy</Link></li>
                 </ul>
-              </div>
-              <div>
-                <h3>Legal</h3>
-                <ul>
-                  <li><a href="#">Terms of Service</a></li>
-                  <li><a href="#">Privacy Policy</a></li>
-                  <li><a href="#">Cookie Policy</a></li>
-                </ul>
-              </div>
-              <div>
-                <h3>Connect</h3>
-                <div className="splashpage-social-icons">
-                  <a href="#"><i className='bx bxl-facebook-circle'></i></a>
-                  <a href="#"><i className='bx bxl-twitter'></i></a>
-                  <a href="#"><i className='bx bxl-instagram'></i></a>
-                  <a href="#"><i className='bx bxl-linkedin'></i></a>
-                </div>
               </div>
             </div>
             <div className="splashpage-footer-copyright">
