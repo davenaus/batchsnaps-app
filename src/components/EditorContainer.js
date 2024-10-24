@@ -88,31 +88,53 @@ function EditorContainer() {
 
   const handleManageBilling = async () => {
     try {
-      // Get the current session
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      // Get current session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const currentSession = sessionData.session;
+      
+      console.log('Current session:', currentSession ? 'exists' : 'null');
       
       if (!currentSession) {
-        throw new Error('No active session');
+        throw new Error('No active session found');
       }
   
-      const { data, error } = await supabase.functions.invoke('create-portal-session', {
-        body: JSON.stringify({ 
-          returnUrl: window.location.origin + '/editor' 
-        }),
-        headers: {
-          Authorization: `Bearer ${currentSession.access_token}`
+      // Log request details
+      console.log('Making request to create-portal-session with token:', 
+        currentSession.access_token.substring(0, 10) + '...');
+  
+      const { data, error } = await supabase.functions.invoke(
+        'create-portal-session',
+        {
+          body: { 
+            returnUrl: window.location.origin + '/editor'
+          },
+          headers: {
+            Authorization: `Bearer ${currentSession.access_token}`
+          }
         }
-      });
+      );
   
-      if (error) throw error;
-      if (!data?.url) throw new Error('No portal URL returned');
+      console.log('Response:', { data, error });
   
-      // Redirect to the Stripe portal
+      if (error) {
+        throw error;
+      }
+  
+      if (!data?.url) {
+        throw new Error('No portal URL returned from Stripe');
+      }
+  
       window.location.href = data.url;
+      
     } catch (error) {
-      console.error('Billing portal error:', error);
-      // Provide a more user-friendly error message
-      alert('Unable to access billing portal at this time. Please try again later or contact support.');
+      console.error('Billing portal detailed error:', {
+        message: error.message,
+        name: error.name,
+        stack: error.stack,
+        details: error.details,
+      });
+      
+      alert('Unable to access billing portal. Please try again or contact support.');
     }
   };
 
