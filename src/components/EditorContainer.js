@@ -377,7 +377,7 @@ function EditorContainer() {
 
 
   useEffect(() => {
-    if (!isPremium) {
+    if (!isPremium && !isMobile) {
       try {
         const script = document.createElement('script');
         script.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js';
@@ -386,15 +386,15 @@ function EditorContainer() {
           console.log('Ad script failed to load - continuing without ads');
         };
         document.body.appendChild(script);
-
+  
         // Initialize ads
         try {
           (window.adsbygoogle = window.adsbygoogle || []).push({});
-          (window.adsbygoogle = window.adsbygoogle || []).push({}); // Push twice for two ads
+          (window.adsbygoogle = window.adsbygoogle || []).push({});
         } catch (adsError) {
           console.log('Ads initialization error:', adsError);
         }
-
+  
         return () => {
           if (document.body.contains(script)) {
             document.body.removeChild(script);
@@ -404,7 +404,18 @@ function EditorContainer() {
         console.log('Ad setup error:', error);
       }
     }
-  }, [isPremium]);
+  }, [isPremium, isMobile]);
+
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 1024);
+
+useEffect(() => {
+  const handleResize = () => {
+    setIsMobile(window.innerWidth <= 1024);
+  };
+
+  window.addEventListener('resize', handleResize);
+  return () => window.removeEventListener('resize', handleResize);
+}, []);
 
   return (
     <div className="editor-container">
@@ -437,53 +448,53 @@ function EditorContainer() {
         </div>
       </header>
 
-      {/* Left Ad */}
-      {!isPremium && (
-        <div style={{
-          position: 'fixed',
-          left: '0',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '160px',
-          height: '600px',
-          zIndex: 999
-        }}>
-          <ins className="adsbygoogle"
-            style={{
-              display: 'block',
-              width: '160px',
-              height: '600px'
-            }}
-            data-ad-client="YOUR-AD-CLIENT-ID"
-            data-ad-slot="YOUR-AD-SLOT-ID"
-            data-ad-format="vertical" />
-        </div>
-      )}
+  {/* Left Ad */}
+  {!isPremium && !isMobile && (
+      <div style={{
+        position: 'fixed',
+        left: '0',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '160px',
+        height: '600px',
+        zIndex: 999
+      }}>
+        <ins className="adsbygoogle"
+          style={{
+            display: 'block',
+            width: '160px',
+            height: '600px'
+          }}
+          data-ad-client="YOUR-AD-CLIENT-ID"
+          data-ad-slot="YOUR-AD-SLOT-ID"
+          data-ad-format="vertical" />
+      </div>
+    )}
 
-      {/* Right Ad */}
-      {!isPremium && (
-        <div style={{
-          position: 'fixed',
-          right: '0',
-          top: '50%',
-          transform: 'translateY(-50%)',
-          width: '160px',
-          height: '600px',
-          zIndex: 999
-        }}>
-          <ins className="adsbygoogle"
-            style={{
-              display: 'block',
-              width: '160px',
-              height: '600px'
-            }}
-            data-ad-client="YOUR-AD-CLIENT-ID"
-            data-ad-slot="YOUR-AD-SLOT-ID"
-            data-ad-format="vertical" />
-        </div>
-      )}
+    {/* Right Ad */}
+    {!isPremium && !isMobile && (
+      <div style={{
+        position: 'fixed',
+        right: '0',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '160px',
+        height: '600px',
+        zIndex: 999
+      }}>
+        <ins className="adsbygoogle"
+          style={{
+            display: 'block',
+            width: '160px',
+            height: '600px'
+          }}
+          data-ad-client="YOUR-AD-CLIENT-ID"
+          data-ad-slot="YOUR-AD-SLOT-ID"
+          data-ad-format="vertical" />
+      </div>
+    )}
 
-      <div className="editor-content" style={{ margin: !isPremium ? '0 160px' : '0' }}>
+    <div className="editor-content" style={{ margin: (!isPremium && !isMobile) ? '0 160px' : '0' }}>
         {images.length === 0 ? (
           <div className="editor-drop-area" onClick={triggerFileUpload}>
             <i className='bx bx-upload'></i>

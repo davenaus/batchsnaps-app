@@ -621,6 +621,7 @@
 
   #root {
     align-self: center;
+    min-width: 100%;
   }
 
   .navigation-button {
@@ -760,6 +761,10 @@
     padding-bottom: calc(env(safe-area-inset-bottom, 20px) + 60px);
   }
 }
+
+
+
+
 
 
 
